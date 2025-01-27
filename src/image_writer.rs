@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::image_data::ImageData;
 use crate::render_char_to_png::{CHAR_HEIGHT, CHAR_WIDTH};
 use image::GenericImageView;
@@ -187,7 +189,7 @@ impl AsciiImageWriter {
     /// # Returns
     /// - An `Option` containing `Some` `AsciiImageWriter` upon success, or a
     /// `None` upon failure.
-    pub fn from_2d_vec(parts: Vec<Vec<ImageData>>) -> Option<Self> {
+    pub fn from_2d_vec(parts: Arc<Vec<Vec<ImageData>>>) -> Option<Self> {
         if parts.is_empty() || parts[0].is_empty() {
             return None; // no image to build
         }
@@ -195,7 +197,7 @@ impl AsciiImageWriter {
         let (mut height, mut width) = (0, 0);
         // find out the new canvas size
         let mut cur_line = 0;
-        for line in &parts {
+        for line in parts.iter() {
             // assume that every image has the same height and width
             if !line.is_empty() {
                 height += line[0].height();
@@ -216,6 +218,7 @@ impl AsciiImageWriter {
         let mut canvas: image::ImageBuffer<image::Rgba<u8>, Vec<u8>> =
             image::ImageBuffer::new(width, height);
 
+        let parts_copy = Arc::clone(&parts);
         canvas.par_enumerate_pixels_mut().for_each(|(x, y, pixel)| {
             // the index into the row and column from the parts vec
             let row = y / CHAR_HEIGHT as u32;
@@ -225,7 +228,7 @@ impl AsciiImageWriter {
             let inner_x = x % CHAR_WIDTH as u32;
             let inner_y = y % CHAR_HEIGHT as u32;
 
-            let new_pixel = parts[row as usize][column as usize].get_pixel(inner_x, inner_y);
+            let new_pixel = parts_copy[row as usize][column as usize].get_pixel(inner_x, inner_y);
             // write the pixel we have chosen
             *pixel = *new_pixel;
         });

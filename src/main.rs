@@ -85,7 +85,8 @@ fn convert_ascii_to_png(input_file_name: &str, output_file_name: &str) {
         lines.push(char_images);
     }
 
-    let final_image_writer: Option<AsciiImageWriter> = AsciiImageWriter::from_2d_vec(lines);
+    let final_image_writer: Option<AsciiImageWriter> =
+        AsciiImageWriter::from_2d_vec(Arc::new(lines));
 
     match final_image_writer {
         Some(writer) => {
