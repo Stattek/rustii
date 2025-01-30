@@ -218,8 +218,7 @@ impl AsciiImageWriter {
         let mut canvas: image::ImageBuffer<image::Rgba<u8>, Vec<u8>> =
             image::ImageBuffer::new(width, height);
 
-        let parts_copy = Arc::clone(&parts);
-        canvas.par_enumerate_pixels_mut().for_each(|(x, y, pixel)| {
+        for (x, y, pixel) in canvas.enumerate_pixels_mut() {
             // the index into the row and column from the parts vec
             let row = y / CHAR_HEIGHT as u32;
             let column = x / CHAR_WIDTH as u32;
@@ -228,10 +227,10 @@ impl AsciiImageWriter {
             let inner_x = x % CHAR_WIDTH as u32;
             let inner_y = y % CHAR_HEIGHT as u32;
 
-            let new_pixel = parts_copy[row as usize][column as usize].get_pixel(inner_x, inner_y);
+            let new_pixel = parts[row as usize][column as usize].get_pixel(inner_x, inner_y);
             // write the pixel we have chosen
             *pixel = *new_pixel;
-        });
+        }
 
         // save the new image buffer
         Some(Self {
