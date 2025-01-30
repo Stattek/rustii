@@ -18,6 +18,9 @@ pub const CHAR_HEIGHT: i32 = CHAR_FONT_SIZE;
 pub const CHAR_WIDTH: i32 = CHAR_FONT_SIZE / 2;
 
 /// Converts string data into a png
+///
+/// NOTE: this is one of the hottest functions in this program,
+/// this should be optimized.
 pub fn str_to_png(data: ColoredStr) -> Result<ImageData, ()> {
     let renderer = TextRenderer::default();
     let text_png = renderer.render_text_to_png_data(
