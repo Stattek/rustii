@@ -61,6 +61,7 @@ fn convert_ascii_to_png(input_file_name: &str, output_file_name: &str) {
                 .as_str(),
             );
 
+            // TODO: parallelize converting string to png. One solution could be to save `ColoredStr` objects in a vec and use rayon to parallelize converting strings to png.
             let generated_png = {
                 if the_str.trim().is_empty() {
                     // create a transparent png for a space
